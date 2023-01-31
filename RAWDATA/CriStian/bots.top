@@ -106,7 +106,7 @@ u: UNSPECIFIEDTERMECTS (~ects !each !~number ~term) Which one do you mean?
 
 topic: ~course_info (~course_name)
 
-t: ^keep() Would you like to know know something about the offer of CS intitute?
+t: ^keep() Would you like to know know something about the offer of CS institute?
 	a: ([~yes yes]) What of the subjects are you interested in? Maybe $cur=^pick(~course_name) $cur?
 		b: (~ects) ^reuse( CHECKECTS )
 		b: ([when ~term]) ^reuse( CHECKTERM )
@@ -114,7 +114,7 @@ t: ^keep() Would you like to know know something about the offer of CS intitute?
 		B: (offer) ^reuse( CHECKOFFER )
 
 u: CHECKECTS ([many ~number] ~ects * {_~course_name $cur='_0}) ^repeat() ^keep() 
-  	if (^query(direct_sv $cur ects ?)) { You can get @0object ECTS ponits for the @0subject. }
+  	if (^query(direct_sv $cur ects ?)) { You can get @0object ECTS points for the @0subject. }
   	else {I have no idea about $cur}
   	
 u: CHECKTERM ([when ~term] < * {_~course_name  $cur='_0}) ^repeat() ^keep() 
@@ -151,4 +151,17 @@ u: ([about happen] * ~bots) ^repeat() ^keep()
 	Some modules will perhaps be (in some basic version) prepared by the subject leader. Some bot modules will be done in teams.
 	
 
+#
+# ECTS COUNTING
+#
+
+# TODO: topic name?
+
+u: CHECKSUMECTS ([many much] ~ects * I have *) ^repeat() ^keep()
+    Response some
+#    $_jsonobject = ["raz" "dwa" "trzy"]
+#    ^jsonloop($_jsonobject $_field $_value)
+#    {
+#        $_value
+#    }
 
