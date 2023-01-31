@@ -17,7 +17,7 @@ concept: ~classtype (lecture class lab exercise project type)
 
 # COURSES
 concept: ~bots ("project conversation bots and answering questions" "project conversational bots and answering questions")
-concept: ~compulsory_courses ("Numerical Analysis")
+concept: ~compulsory_courses ("numerical analysis")
 concept: ~course_name (~compulsory_courses ~bots)
 
 # NUMBERS
@@ -52,6 +52,7 @@ if (^offered != *) { createfact(^subject offer ^offered) }
 DATA:
 "project conversation bots and answering questions" 6 project winter true false false prych
 "project conversational bots and answering questions"  6 project winter true false false prych
+"numerical analysis" 9 ione summer true true true rno # TODO: This is false, just for testing
 
 
 
@@ -68,7 +69,7 @@ DATA:
 
 topic: ~introductions ()
 
-t: [Hello] [Hi] [Hey], [talk] [speak] [say something] to me!  
+t: [Hello] [Hi] [Hey], [talk] [speak] [say something] to me!
 
 u: (what are you) I am a bot.
 
@@ -106,14 +107,33 @@ u: UNSPECIFIEDTERMECTS (~ects !each !~number ~term) Which one do you mean?
 
 topic: ~course_info (~course_name)
 
-t: ^keep() Would you like to know know something about the offer of CS institute?
+t: ^keep() Would you like to know something about the offer of CS institute?
 	a: ([~yes yes]) What of the subjects are you interested in? Maybe $cur=^pick(~course_name) $cur?
 		b: (~ects) ^reuse( CHECKECTS )
 		b: ([when ~term]) ^reuse( CHECKTERM )
 		b: (~classtype) ^reuse ( CHECKTYPE )
-		B: (offer) ^reuse( CHECKOFFER )
+		b: (offer) ^reuse( CHECKOFFER )
+		b: (finished) ^reuse( COURSEFINISHED )
 
-u: CHECKECTS ([many ~number] ~ects * {_~course_name $cur='_0}) ^repeat() ^keep() 
+#! How many ects I have now?
+u: ([many much] ~ects * I have now *) ^repeat() ^keep()
+    $_counter = 0
+    $_points = 0
+    $_len = ^length($finished_classes)
+    ^loop($_len)
+    {
+        if (^query(direct_sv $finished_classes[$_counter] ects ?)) {$_points += @0object}
+        $_counter += 1
+    }
+    $_formatted_classes = ^jsonwrite( $finished_classes )
+    You have $_points ECTS points, your finished classes are: $_formatted_classes.
+
+u: COURSEFINISHED ([finish] * {_~course_name $cur='_0}) ^repeat() ^keep()
+    $finished_classes = ^jsoncreate(PERMANENT array)
+    ^jsonarrayinsert(UNIQUE $finished_classes $cur)
+    Okay, so you've already finished this course. Your finished classes are: $finished_classes.
+
+u: CHECKECTS ([many ~number] ~ects <<get>> {_~course_name $cur='_0}) ^repeat() ^keep()
   	if (^query(direct_sv $cur ects ?)) { You can get @0object ECTS points for the @0subject. }
   	else {I have no idea about $cur}
   	
@@ -151,17 +171,5 @@ u: ([about happen] * ~bots) ^repeat() ^keep()
 	Some modules will perhaps be (in some basic version) prepared by the subject leader. Some bot modules will be done in teams.
 	
 
-#
-# ECTS COUNTING
-#
 
-# TODO: topic name?
-
-u: CHECKSUMECTS ([many much] ~ects * I have *) ^repeat() ^keep()
-    Response some
-#    $_jsonobject = ["raz" "dwa" "trzy"]
-#    ^jsonloop($_jsonobject $_field $_value)
-#    {
-#        $_value
-#    }
 
