@@ -10,7 +10,7 @@ $cs_token += #SPLIT_QUOTE | #NO_WITHIN | #STRICT_CASING
 $cs_token -= #DO_INTERJECTIONS
 
 # This sets the default topic to be using when running the system
-^addtopic(~introductions)
+^addtopic(~course_info)
 
 $cs_control_main = ~control
 # $cs_control_post = ~XPOSTPROCESS  # uncomment to enable talk
@@ -39,7 +39,7 @@ topic: ~control system ()
 
 # on startup, do introduction.  It takes the user input which starts a new conversation and looks for a response in  ~introductions
 u: ( %input<%userfirstline) 
-	gambit(~introductions)
+	gambit(~course_info)
 
 # if the user says shut up anywhere in the response, set the variable $shutup to 1, which is used later to stop using the talk output in windows
 u: (< shut up >) $shutup = 1
@@ -97,7 +97,7 @@ u: () # main per-sentence processing
 	# now we need to find fake responses 
 	if (%response == $_responseCount AND %rand > 50)
 	{
-		nofail(TOPIC respond(~QUIBBLE_ALL))
+		nofail(TOPIC respond(~keyword_less))
 	}
 
 	# if we have rejoinders for what we said OR we asked a question, stop here
