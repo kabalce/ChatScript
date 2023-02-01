@@ -7,6 +7,8 @@ concept: ~greater (greater bigger)
 concept: ~lesser (lesser smaller)
 concept: ~equal (equal same equivalent equally identical)
 concept: ~comparison (~greater ~lesser ~equal)
+concept: ~finish (finish complete pass)
+concept: ~have (have collect earn complete gather)
 
 # ATTRIBUTES
 concept: ~ects (ects ECTS point "ects point" "ECTS point" "ects points" "ECTS points")
@@ -71,22 +73,16 @@ topic: ~introductions ()
 
 t: [Hello] [Hi] [Hey], [talk] [speak] [say something] to me!
 
-u: (what are you) I am a bot.
-
-u: (where do you live) I live on your computer.
-
-u: ([what where]) Good question.
-
 t: ^keep() What would you like to know about the courses in CS department?
 	a: () ^respond (~course_info)
 
 #	
-# COMPULSORY	
+# TODO: COMPULSORY
 #
 
 topic: ~compulsory (compulsory require requirement)
 
-u: COMPULSORYCOURSES (compulsory !~course_info)   # TODO
+u: COMPULSORYCOURSES (compulsory !~course_info)
 	The compulsory courses are: AN, MD, LdI...
 	
 u: (compulsory _~course_info $cur='_0) 
@@ -113,25 +109,13 @@ t: ^keep() Would you like to know something about the offer of CS institute?
 		b: ([when ~term]) ^reuse( CHECKTERM )
 		b: (~classtype) ^reuse ( CHECKTYPE )
 		b: (offer) ^reuse( CHECKOFFER )
-		b: (finished) ^reuse( COURSEFINISHED )
+		b: (~finish) ^reuse( COURSEFINISHED )
 
-#! How many ects I have now?
-u: ([many much] ~ects * I have now *) ^repeat() ^keep()
-    $_counter = 0
-    $_points = 0
-    $_len = ^length($finished_classes)
-    ^loop($_len)
-    {
-        if (^query(direct_sv $finished_classes[$_counter] ects ?)) {$_points += @0object}
-        $_counter += 1
-    }
-    $_formatted_classes = ^jsonwrite( $finished_classes )
-    You have $_points ECTS points, your finished classes are: $_formatted_classes.
-
-u: COURSEFINISHED ([finish] * {_~course_name $cur='_0}) ^repeat() ^keep()
+u: COURSEFINISHED ([~finish] * {_~course_name $cur='_0}) ^repeat() ^keep()
     $finished_classes = ^jsoncreate(PERMANENT array)
     ^jsonarrayinsert(UNIQUE $finished_classes $cur)
-    Okay, so you've already finished this course. Your finished classes are: $finished_classes.
+    $_formatted_classes = ^jsonwrite( $finished_classes )
+    Okay, so you've already finished this course. Your finished classes are: $formatted_classes.
 
 u: CHECKECTS ([many ~number] ~ects <<get>> {_~course_name $cur='_0}) ^repeat() ^keep()
   	if (^query(direct_sv $cur ects ?)) { You can get @0object ECTS points for the @0subject. }
@@ -156,7 +140,21 @@ u: CHECKOFFER (offer < * {_~course_name  $cur='_0}) ^repeat() ^keep()
   	a: (~term) ^reuse ( CHECKTERM ) 
 	
 u: REQUIREMENTS ([require requirement] < * {_~course_info  $cur='_0}) 
-	I don't know the requirements for $cur. 
+	I don't know the requirements for $cur.
+
+#! How many ects I have now?
+?: ([many much] ~ects * I ~have *) ^repeat() ^keep()
+    $_counter = 0
+    $_points = 0
+    $_len = ^length($finished_classes)
+    ^loop($_len)
+    {
+        if (^query(direct_sv $finished_classes[$_counter] ects ?)) {$_points += @0object}
+        $_counter += 1
+    }
+    $_formatted_classes = ^jsonwrite( $finished_classes )
+    You have $_points ECTS points, your finished classes are: $_formatted_classes.
+
 	
 # TODO: check if compulsory ^respond(~compulsory)
 
