@@ -57,26 +57,11 @@ DATA:
 "numerical analysis" 9 ione summer true true true rno # TODO: This is false, just for testing
 
 
-
-
 #
 #
 # TOPICS
 # 
 #
-
-#
-# INTRODUCTORY TOPIC
-#
-
-topic: ~introductions ()
-
-t: $finished_classes = ^jsoncreate(PERMANENT array)
-[Hello] [Hi] [Hey], [talk] [speak] [say something] to me!
-
-
-t: ^keep() What would you like to know about the courses in CS department?
-	a: () ^respond (~course_info)
 
 #	
 # TODO: COMPULSORY
@@ -105,8 +90,11 @@ u: UNSPECIFIEDTERMECTS (~ects !each !~number ~term) Which one do you mean?
 
 topic: ~course_info (~course_name)
 
-t: ^keep() Do you want to learn about the offer of CS institute?
-	a: ([~yes yes]) Which of the subjects are you interested in? Maybe $cur=^pick(~course_name) $cur?
+t: $finished_classes = ^jsoncreate(PERMANENT array)
+Hello, talk to me!
+
+t: Do you want to learn about the offer of CS institute? ^repeat() ^keep()
+	a: ([~yes yes]) Which of the subjects are you interested in? Maybe $cur=^pick(~course_name) $cur? ^repeat() ^keep()
 		b: (~ects) ^reuse( CHECKECTS )
 		b: ([when ~term]) ^reuse( CHECKTERM )
 		b: (~classtype) ^reuse ( CHECKTYPE )
@@ -114,10 +102,10 @@ t: ^keep() Do you want to learn about the offer of CS institute?
 		b: (~finish) ^reuse( COURSEFINISHED )
 
 
-u: COURSEFINISHED ([~finish] * {_~course_name}) ^repeat() ^keep()
+u: COURSEFINISHED (~finish {_~course_name}) ^repeat() ^keep()
     $temp = ^join( $cur '_0 )
     if ($cur != $temp) { $cur = '_0' }
-    ^jsonarrayinsert(UNIQUE $finished_classes $cur)
+    ^jsonarrayinsert( UNIQUE $finished_classes $cur )
     $_formatted_classes = ^jsonwrite( $finished_classes )
     Okay, so you've already finished this course. Your finished classes are: $_formatted_classes.
 
@@ -151,7 +139,7 @@ u: CHECKOFFER (offer < * {_~course_name}) ^repeat() ^keep()
   	
   	a: (~term) ^reuse ( CHECKTERM ) 
 	
-u: REQUIREMENTS ([require requirement] < * {_~course_info})
+u: REQUIREMENTS ([require requirement] < * {_~course_info}) ^repeat() ^keep()
     $temp = ^join( $cur '_0 )
     if ($cur != $temp) { $cur = '_0' }
 	I don't know the requirements for $cur.
