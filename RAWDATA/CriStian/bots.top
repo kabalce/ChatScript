@@ -71,7 +71,9 @@ DATA:
 
 topic: ~introductions ()
 
-t: [Hello] [Hi] [Hey], [talk] [speak] [say something] to me!
+t: $finished_classes = ^jsoncreate(PERMANENT array)
+[Hello] [Hi] [Hey], [talk] [speak] [say something] to me!
+
 
 t: ^keep() What would you like to know about the courses in CS department?
 	a: () ^respond (~course_info)
@@ -103,35 +105,45 @@ u: UNSPECIFIEDTERMECTS (~ects !each !~number ~term) Which one do you mean?
 
 topic: ~course_info (~course_name)
 
-t: ^keep() Would you like to know something about the offer of CS institute?
-	a: ([~yes yes]) What of the subjects are you interested in? Maybe $cur=^pick(~course_name) $cur?
+t: ^keep() Do you want to learn about the offer of CS institute?
+	a: ([~yes yes]) Which of the subjects are you interested in? Maybe $cur=^pick(~course_name) $cur?
 		b: (~ects) ^reuse( CHECKECTS )
 		b: ([when ~term]) ^reuse( CHECKTERM )
 		b: (~classtype) ^reuse ( CHECKTYPE )
 		b: (offer) ^reuse( CHECKOFFER )
 		b: (~finish) ^reuse( COURSEFINISHED )
 
-u: COURSEFINISHED ([~finish] * {_~course_name $cur='_0}) ^repeat() ^keep()
-    $finished_classes = ^jsoncreate(PERMANENT array)
+
+u: COURSEFINISHED ([~finish] * {_~course_name}) ^repeat() ^keep()
+    $temp = ^join( $cur '_0 )
+    if ($cur != $temp) { $cur = '_0' }
     ^jsonarrayinsert(UNIQUE $finished_classes $cur)
     $_formatted_classes = ^jsonwrite( $finished_classes )
-    Okay, so you've already finished this course. Your finished classes are: $formatted_classes.
+    Okay, so you've already finished this course. Your finished classes are: $_formatted_classes.
 
-u: CHECKECTS ([many ~number] ~ects <<get>> {_~course_name $cur='_0}) ^repeat() ^keep()
+u: CHECKECTS ([many ~number] ~ects <<get>> {_~course_name}) ^repeat() ^keep()
+    $temp = ^join( $cur '_0 )
+    if ($cur != $temp) { $cur = '_0' }
   	if (^query(direct_sv $cur ects ?)) { You can get @0object ECTS points for the @0subject. }
   	else {I have no idea about $cur}
   	
-u: CHECKTERM ([when ~term] < * {_~course_name  $cur='_0}) ^repeat() ^keep() 
+u: CHECKTERM ([when ~term] < * {_~course_name}) ^repeat() ^keep()
+    $temp = ^join( $cur '_0 )
+    if ($cur != $temp) { $cur = '_0' }
   	if (^query(direct_sv $cur term ?)) { The course @0subject is offered in the @0object term. }
   	else {I have no idea about $cur}
   	
   	a: ([now "this year" "this time"]) ^reuse ( CHECKOFFER ) 
   	
-u: CHECKTYPE (~classtype < * {_~course_name  $cur='_0}) ^repeat() ^keep() 
+u: CHECKTYPE (~classtype < * {_~course_name}) ^repeat() ^keep()
+    $temp = ^join( $cur '_0 )
+    if ($cur != $temp) { $cur = '_0' }
   	if (^query(direct_sv $cur classtype ?)) { The course @0subject is offered in the @0object form. }
   	else {I have no idea about $cur}
   	
-u: CHECKOFFER (offer < * {_~course_name  $cur='_0}) ^repeat() ^keep() 
+u: CHECKOFFER (offer < * {_~course_name}) ^repeat() ^keep()
+    $temp = ^join( $cur '_0 )
+    if ($cur != $temp) { $cur = '_0' }
 	if (^query(direct_sv $cur offer ?))  {
 		if (@0object == "true") { The course @0subject is offered in the current cycle. }
 		else { The course @0subject is not offered in the current cycle. Please try next year. } }
@@ -139,7 +151,9 @@ u: CHECKOFFER (offer < * {_~course_name  $cur='_0}) ^repeat() ^keep()
   	
   	a: (~term) ^reuse ( CHECKTERM ) 
 	
-u: REQUIREMENTS ([require requirement] < * {_~course_info  $cur='_0}) 
+u: REQUIREMENTS ([require requirement] < * {_~course_info})
+    $temp = ^join( $cur '_0 )
+    if ($cur != $temp) { $cur = '_0' }
 	I don't know the requirements for $cur.
 
 #! How many ects I have now?
