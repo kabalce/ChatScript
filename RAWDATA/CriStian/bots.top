@@ -93,8 +93,8 @@ topic: ~course_info (~course_name)
 t: $finished_classes = ^jsoncreate(PERMANENT array)
 Hello, talk to me!
 
-t: Do you want to learn about the offer of CS institute? ^repeat() ^keep()
-	a: ([~yes yes]) Which of the subjects are you interested in? Maybe $cur=^pick(~course_name) $cur? ^repeat() ^keep()
+t: Do you want to learn about the offer of CS institute? ^keep()
+	a: ([~yes yes]) Which of the subjects are you interested in? Maybe $cur=^pick(~course_name) $cur?
 		b: (~ects) ^reuse( CHECKECTS )
 		b: ([when ~term]) ^reuse( CHECKTERM )
 		b: (~classtype) ^reuse ( CHECKTYPE )
